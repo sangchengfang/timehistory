@@ -178,8 +178,6 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write('\n')
 
 
-
-
 Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Lambeck_TH_selected.dat', 1000.0, 94.24)
 write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH_plateau.dat', 'Lamb_norm_TH_first.dat', 'Lamb_norm_TH_last.dat', 'Lamb_norm_TH_delete.dat')
 
