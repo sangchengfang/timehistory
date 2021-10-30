@@ -181,10 +181,10 @@ def write_file(origin_all, all, first_part, last_part, deleted):
 
 
 Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Lambeck_TH_selected.dat', 1000.0, 94.24)
-write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH_all.dat', 'Lamb_norm_TH_first.dat', 'Lamb_norm_TH_last.dat', 'Lamb_norm_TH_delete.dat')
+write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH_plateau.dat', 'Lamb_norm_TH_first.dat', 'Lamb_norm_TH_last.dat', 'Lamb_norm_TH_delete.dat')
 
 Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Wanghs_TH.dat', 1000.0, 94.24)
-write_file('Whs_norm_TH.dat', 'Whs_norm_TH_all.dat', 'Whs_norm_TH_first.dat', 'Whs_norm_TH_last.dat', 'Whs_norm_TH_delete.dat')
+write_file('Whs_norm_TH.dat', 'Whs_norm_TH_plateau.dat', 'Whs_norm_TH_first.dat', 'Whs_norm_TH_last.dat', 'Whs_norm_TH_delete.dat')
 
 
 
