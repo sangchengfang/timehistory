@@ -174,7 +174,6 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write(str(Gdeleted['time'][i]).ljust(8))
             fop.write(str(format(float(Gdeleted['norm_thick'][i]), '.8f')).ljust(12))
             fop.write(str(format(float(Gdeleted['thick'][i]), '.8f')))
-
             fop.write('\n')
 
 
@@ -183,7 +182,3 @@ write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH_plateau.dat', 'Lamb_norm_TH_first.d
 
 Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Wanghs_TH.dat', 1000.0, 94.24)
 write_file('Whs_norm_TH.dat', 'Whs_norm_TH_plateau.dat', 'Whs_norm_TH_first.dat', 'Whs_norm_TH_last.dat', 'Whs_norm_TH_delete.dat')
-
-
-
-
