@@ -90,7 +90,7 @@ def norm_and_trunc(origin_time_his, max_ice, ice_now):
             # print(deleted)
             reserved['res_thick'].insert(-1, max_ice)
             reserved['res_time'].insert(-1, last_time)
-            reserved['res_norm_thick'] = [item/max_ice for item in reserved['res_thick']]
+            reserved['res_norm_thick'] = [item / max_ice for item in reserved['res_thick']]
         else:
             print('wrong reserved time history')
         # print(reserved)
@@ -120,5 +120,7 @@ def write_file(file, file_truncated):
 Gno_truncate, Greserved, Gtruncated = norm_and_trunc('Lambeck_TH_selected.dat', 1000.0, 94.24)
 write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH1000.dat')
 
-Gno_truncate, Greserved, Gtruncated = norm_and_trunc('Wanghs.dat', 1000.0, 94.24)
+Gno_truncate, Greserved, Gtruncated = norm_and_trunc('Wanghs_TH.dat', 1000.0, 94.24)
 write_file('Whs_norm_TH.dat', 'Whs_norm_TH1000.dat')
+
+
