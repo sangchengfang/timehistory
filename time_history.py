@@ -17,22 +17,73 @@
 from math import pi
 
 
-def mid_point(coor1, coor2, y3):
+def trunc_point(time, thickness, y3):
     """
     find the x coordinate for the third point x3 in the line defined by (x1, y1) and (x2, y2) given y3
-    :param coor1:
-    :param coor2:
+    :param time: the list contains the time
+    :param data: the number list that will be truncated
     :param y3:
-    :return: x3
+    :return: xa,xb
     """
-    x1 = float(coor1[0])
-    y1 = float(coor1[1])
-    x2 = float(coor2[0])
-    y2 = float(coor2[1])
+
+    time = list(time)
+    thickness = list(thickness)
     y3 = float(y3)
 
-    x3 = format((y3 - y1) * (x1 - x2) / (y1 - y2) + x1, '.3f')
-    return x3
+    # find the index when the thickness exactly larger than max ice thickness 'max_ice'
+    # index could be one or two.
+    trunc_index = list()
+    i = 0
+    for item in thickness:
+        item = float(item)
+        if item <= y3:
+            i = i + 1
+        else:
+            trunc_index.append(i)
+            break
+    # print(i)
+    j = -1
+    for item in reversed(thickness):
+        # print(item)
+        if item < y3:
+            j = j - 1
+        else:
+            trunc_index.append(j)
+            break
+    # print(j)
+
+    first_x1 = float(time[i-1])
+    first_y1 = float(thickness[i-1])
+    first_x2 = float(time[i])
+    first_y2 = float(thickness[i])
+
+    last_x1 = float(time[j])
+    last_y1 = float(thickness[j])
+    last_x2 = float(time[j+1])
+    last_y2 = float(thickness[j+1])
+
+    first_x3 = float(format((y3 - first_y1) * (first_x1 - first_x2) / (first_y1 - first_y2) + first_x1, '.3f'))
+    last_x3 = float(format((y3 - last_y1) * (last_x1 - last_x2) / (last_y1 - last_y2) + last_x1, '.3f'))
+    # print(first_x3)
+    # print(last_x3)
+
+    time.insert(i, first_x3)
+    time.insert(j+1, last_x3)
+    thickness.insert(i, y3)
+    thickness.insert(j+1, y3)
+
+    first = dict()
+    last = dict()
+    deleted = dict()
+
+    first['time'] = time[:i+1]
+    first['thick'] = thickness[:i+1]
+    last['time'] = time[j:]
+    last['thick'] = thickness[j:]
+    deleted['time'] = time[i+1:j]
+    deleted['thick'] = thickness[i+1:j]
+
+    return first, last, deleted
 
 
 def norm_and_trunc(origin_time_his, max_ice, ice_now):
@@ -41,8 +92,6 @@ def norm_and_trunc(origin_time_his, max_ice, ice_now):
     max_ice = float(max_ice)
     ice_now = float(ice_now)
 
-    reserved = dict()
-    deleted = dict()
     no_truncate = dict()
 
     with open(origin_time_his, 'r') as fip:
@@ -65,62 +114,78 @@ def norm_and_trunc(origin_time_his, max_ice, ice_now):
             new_thick.append(item)
             norm_thickness.append(format(item / (max_ice + ice_now), '.6f'))
         no_truncate['norm_thick'] = norm_thickness
+        no_truncate['thick'] = new_thick
 
-        # find the index when the thickness exactly larger than max ice thickness 'max_ice'
-        i = 0
-        for item in new_thick:
-            # print(item)
-            if item <= max_ice:
-                i = i + 1
-            else:
-                break
+    first_part, last_part, deleted = trunc_point(time, new_thick, max_ice)
+    first_part['norm_thick'] = [item / max_ice for item in first_part['thick']]
+    last_part['norm_thick'] = [item / max_ice for item in last_part['thick']]
+    deleted['norm_thick'] = [item / max_ice for item in deleted['thick']]
 
-        reserved['res_thick'] = new_thick[0:i + 1]
-        deleted['del_thick'] = new_thick[i:]
-        reserved['res_time'] = time[0:i + 1]
-        deleted['del_time'] = time[i:]
+    # print(first_part)
+    # print(last_part)
+    # print(deleted)
+    # print(no_truncate)
 
-        if reserved['res_thick'][-1] > max_ice > reserved['res_thick'][-2]:
-            print('right reserved time history')
-            coor1 = (reserved['res_time'][-2], reserved['res_thick'][-2])
-            coor2 = (reserved['res_time'][-1], reserved['res_thick'][-1])
-            last_time = mid_point(coor1, coor2, max_ice)
-            # print(last_time)
-            # print(reserved)
-            # print(deleted)
-            reserved['res_thick'].insert(-1, max_ice)
-            reserved['res_time'].insert(-1, last_time)
-            reserved['res_norm_thick'] = [item / max_ice for item in reserved['res_thick']]
-        else:
-            print('wrong reserved time history')
-        # print(reserved)
-        # print(deleted)
-        # print(no_truncate)
-    return no_truncate, reserved, deleted
+    return no_truncate, first_part, last_part, deleted
 
 
-def write_file(file, file_truncated):
-    file = str(file)
-    file_truncated = str(file_truncated)
+def write_file(origin_all, all, first_part, last_part, deleted):
+    origin_all = str(origin_all)
+    all = str(all)
+    first_part = str(first_part)
+    last_part = str(last_part)
+    deleted = str(deleted)
 
-    with open(file, 'w') as fop:
-        for i in range(len(Gno_truncate['time'])):
-            fop.write(str(Gno_truncate['time'][i]).ljust(8))
-            fop.write(str(Gno_truncate['norm_thick'][i]))
+    with open(origin_all, 'w') as fop:
+        for i in range(len(Gall['time'])):
+            fop.write(str(Gall['time'][i]).ljust(8))
+            fop.write(str(format(float(Gall['norm_thick'][i]), '.8f')).ljust(12))
+            fop.write(str(format(float(Gall['thick'][i]), '.8f')))
             fop.write('\n')
 
-    with open(file_truncated, 'w') as fop:
-        for i in range(len(Greserved['res_time'])):
-            fop.write(str(Greserved['res_time'][i]).ljust(8))
-            fop.write(str(format(Greserved['res_thick'][i], '.6f').ljust(14)))
-            fop.write(str(format(Greserved['res_norm_thick'][i], '.6f')))
+    with open(all, 'w') as fop:
+        for i in range(len(Gfirst_part['time'])):
+            fop.write(str(Gfirst_part['time'][i]).ljust(8))
+            fop.write(str(format(float(Gfirst_part['norm_thick'][i]), '.8f')).ljust(12))
+            fop.write(str(format(float(Gfirst_part['thick'][i]), '.8f')))
+            fop.write('\n')
+        for i in range(len(Glast_part['time'])):
+            fop.write(str(Glast_part['time'][i]).ljust(8))
+            fop.write(str(format(float(Glast_part['norm_thick'][i]), '.8f')).ljust(12))
+            fop.write(str(format(float(Glast_part['thick'][i]), '.8f')))
+            fop.write('\n')
+
+    with open(first_part, 'w') as fop:
+        for i in range(len(Gfirst_part['time'])):
+            fop.write(str(Gfirst_part['time'][i]).ljust(8))
+            fop.write(str(format(float(Gfirst_part['norm_thick'][i]), '.8f')).ljust(12))
+            fop.write(str(format(float(Gfirst_part['thick'][i]), '.8f')))
+            fop.write('\n')
+
+    with open(last_part, 'w') as fop:
+        for i in range(len(Glast_part['time'])):
+            fop.write(str(Glast_part['time'][i]).ljust(8))
+            fop.write(str(format(float(Glast_part['norm_thick'][i]), '.8f')).ljust(12))
+            fop.write(str(format(float(Glast_part['thick'][i]), '.8f')))
+            fop.write('\n')
+
+    with open(deleted, 'w') as fop:
+        for i in range(len(Gdeleted['time'])):
+            fop.write(str(Gdeleted['time'][i]).ljust(8))
+            fop.write(str(format(float(Gdeleted['norm_thick'][i]), '.8f')).ljust(12))
+            fop.write(str(format(float(Gdeleted['thick'][i]), '.8f')))
+
             fop.write('\n')
 
 
-Gno_truncate, Greserved, Gtruncated = norm_and_trunc('Lambeck_TH_selected.dat', 1000.0, 94.24)
-write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH1000.dat')
 
-Gno_truncate, Greserved, Gtruncated = norm_and_trunc('Wanghs_TH.dat', 1000.0, 94.24)
-write_file('Whs_norm_TH.dat', 'Whs_norm_TH1000.dat')
+
+Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Lambeck_TH_selected.dat', 1000.0, 94.24)
+write_file('Lamb_norm_TH.dat', 'Lamb_norm_TH_all.dat', 'Lamb_norm_TH_first.dat', 'Lamb_norm_TH_last.dat', 'Lamb_norm_TH_delete.dat')
+
+Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Wanghs_TH.dat', 1000.0, 94.24)
+write_file('Whs_norm_TH.dat', 'Whs_norm_TH_all.dat', 'Whs_norm_TH_first.dat', 'Whs_norm_TH_last.dat', 'Whs_norm_TH_delete.dat')
+
+
 
 
