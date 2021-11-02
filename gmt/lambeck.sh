@@ -12,11 +12,13 @@ gmt basemap -R0/35/0/1094.24 -JX15c/5c -Byaf100g100+l"Ice Thickness" -BWSrt --FO
 #        echo "plot line $i"
 #    done
 
+awk '$1!="#" {print $1,$2*1000}' Lamb_norm_TH_plateau.dat | gmt plot -A -Wfatter,gray
+
 awk '$1!="#" {print $1,$2*1094.24}' Lamb_norm_TH.dat | gmt plot -A -Wfat,blue
 
 echo 16.353 1000.00 0.2c | gmt plot -Sa -Gyellow -Wred
 
-awk '$1!="#" {print $1,$2*1000}' Lamb_norm_TH1000.dat | gmt plot -A -Wthicker,red
+awk '$1!="#" {print $1,$2*1000}' Lamb_norm_TH_first.dat | gmt plot -A -Wthicker,red
 
 awk '$1!="#" {print $1,$2*1094.24+$4/134.28*1000}' L_residual.dat | gmt plot -A -Wthinner,green,dashed
 

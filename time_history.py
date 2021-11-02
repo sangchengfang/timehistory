@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#!/usr/bin/env python3
-
 # generate the ice time history based on time history from Wang Hansheng.((( Wang, H. (2001). Effects of glacial
 # isostatic adjustment since the late Pleistocene on the uplift of the Tibetan Plateau. Geophysical Journal
 # International,144(2), 448–458. https://doi.org/10.1046/j.1365-246x.2001.00340.x )))
@@ -14,14 +12,12 @@
 # based on ICESat-1,2 and GRACE/GRACE Follow-On data. Geophysical Research Letters, 48, e2020GL090954.
 # https://doi.org/10.1029/2020GL090954
 
-from math import pi
-
 
 def trunc_point(time, thickness, y3):
     """
     find the x coordinate for the third point x3 in the line defined by (x1, y1) and (x2, y2) given y3
     :param time: the list contains the time
-    :param data: the number list that will be truncated
+    :param thickness: the number list that will be truncated
     :param y3:
     :return: xa,xb
     """
@@ -112,7 +108,7 @@ def norm_and_trunc(origin_time_his, max_ice, ice_now):
         for item in thickness:
             item = (item / max(thickness)) * max_ice + ice_now
             new_thick.append(item)
-            norm_thickness.append(format(item / (max_ice + ice_now), '.6f'))
+            norm_thickness.append(format(item / max_ice, '.6f'))
         no_truncate['norm_thick'] = norm_thickness
         no_truncate['thick'] = new_thick
 
@@ -142,6 +138,7 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write(str(format(float(Gall['norm_thick'][i]), '.8f')).ljust(12))
             fop.write(str(format(float(Gall['thick'][i]), '.8f')))
             fop.write('\n')
+        fop.write(str(format(float(Gall['time'][-1]) + 0.001, '.3f')).ljust(8) + '0'.ljust(12) + '0'.ljust(12))
 
     with open(all, 'w') as fop:
         for i in range(len(Gfirst_part['time'])):
@@ -154,6 +151,8 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write(str(format(float(Glast_part['norm_thick'][i]), '.8f')).ljust(12))
             fop.write(str(format(float(Glast_part['thick'][i]), '.8f')))
             fop.write('\n')
+        fop.write(str(format(float(Glast_part['time'][-1]) + 0.001, '.3f')).ljust(8) + '0'.ljust(12) + '0'.ljust(12))
+        # fop.write()
 
     with open(first_part, 'w') as fop:
         for i in range(len(Gfirst_part['time'])):
@@ -161,6 +160,7 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write(str(format(float(Gfirst_part['norm_thick'][i]), '.8f')).ljust(12))
             fop.write(str(format(float(Gfirst_part['thick'][i]), '.8f')))
             fop.write('\n')
+        fop.write(str(format(float(Gfirst_part['time'][-1]) + 0.001, '.3f')).ljust(8) + '0'.ljust(12) + '0'.ljust(12))
 
     with open(last_part, 'w') as fop:
         for i in range(len(Glast_part['time'])):
@@ -168,6 +168,7 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write(str(format(float(Glast_part['norm_thick'][i]), '.8f')).ljust(12))
             fop.write(str(format(float(Glast_part['thick'][i]), '.8f')))
             fop.write('\n')
+        fop.write(str(format(float(Glast_part['time'][-1]) + 0.001, '.3f')).ljust(8) + '0'.ljust(12) + '0'.ljust(12))
 
     with open(deleted, 'w') as fop:
         for i in range(len(Gdeleted['time'])):
@@ -175,6 +176,7 @@ def write_file(origin_all, all, first_part, last_part, deleted):
             fop.write(str(format(float(Gdeleted['norm_thick'][i]), '.8f')).ljust(12))
             fop.write(str(format(float(Gdeleted['thick'][i]), '.8f')))
             fop.write('\n')
+        fop.write(str(format(float(Gdeleted['time'][-1]) + 0.001, '.3f')).ljust(8) + '0'.ljust(12) + '0'.ljust(12))
 
 
 Gall, Gfirst_part, Glast_part, Gdeleted = norm_and_trunc('Lambeck_TH_selected.dat', 1000.0, 94.24)
