@@ -132,8 +132,8 @@ def norm_time_his(thick):
     thick = list(thick)
     norm_thick = list()
 
-    for item in thick:
-        norm_thick.append(item / max(thick))
+    for i in thick:
+        norm_thick.append(format(i / max(thick), '.6f'))
 
     return norm_thick
 
